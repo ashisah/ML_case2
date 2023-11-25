@@ -42,6 +42,8 @@ if __name__ == "__main__":
     plotVesselTracks(features[:,[2,1]])
     plt.title('All vessel tracks')
     
+    
+    
     #%% Run prediction algorithms and check accuracy
     
     # Prediction with specified number of vessels
