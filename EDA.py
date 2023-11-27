@@ -9,7 +9,7 @@ Created on Fri Nov 24 16:04:09 2023
 from utils import loadData, plotVesselTracks
 import numpy as np
 import matplotlib.pyplot as plt
-
+from matplotlib.animation import FuncAnimation
 #%%load data
 data = loadData('set1.csv')
 features = data[:,2:]
@@ -134,6 +134,25 @@ for i in range(100001, 100021):
     plt.title("Vessel {0}: Direction Change/second vs. Initial Speed".format(i))
     """
 
+#%%Try plotting a track over time
+
+fig = plt.figure()
+
+graph, = plt.plot([], [], 'o')
+
+indices = np.where(labels == 100001)[0].tolist()
+
+x = features[indices, 2]
+y = features[indices, 1]
+
+def animate(i):
+    graph.set_data(x[:i+1], y[:i+1])
+    return graph
+
+anim = FuncAnimation(fig, animate, frames=10, interval=200)
+
+#%%
+plt.show()
+
     
-  
         
