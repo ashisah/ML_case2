@@ -11,18 +11,70 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import adjusted_rand_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
 
 def predictWithK(testFeatures, numVessels, trainFeatures=None, 
                  trainLabels=None):
     # Unsupervised prediction, so training data is unused
+    speed_col = 3
+    dir_col = 4
+   
+    speeds = testFeatures[:, speed_col]
+    degrees = testFeatures[:, dir_col]
     
+    degrees = degrees/10 #converting to degrees
+    degrees = (90-degrees)%360 #converting to correct orientation
+    speeds_knots = speeds/10 #converting to nm/hr
+    speeds_knots_per_sec = speeds_knots/3600 #converting to nm/sec
+    
+    radian_dir = degrees*np.pi/180
+    
+    x_speed_per_sec = 1/48*speeds_knots_per_sec*np.cos(radian_dir)*-1
+    
+    y_speed_per_sec = 1/60*speeds_knots_per_sec*np.sin(radian_dir)
+    
+    speeds_knots_per_sec = speeds_knots_per_sec[..., np.newaxis]
+    x_speed_per_sec = x_speed_per_sec[...,np.newaxis]
+    y_speed_per_sec = y_speed_per_sec[...,np.newaxis]
+    radian_dir = radian_dir[...,np.newaxis]
+
+    new_features = np.concatenate((testFeatures[:, 0:3], speeds_knots_per_sec, radian_dir, x_speed_per_sec, y_speed_per_sec),axis = 1)
+
+    def custom_distance(pt1, pt2):
+        time_diff = pt2[0]-pt1[0]
+        speed_diff = pt2[3]-pt1[3]
+        dir_diff = pt2[4]-pt1[4]
+        if(time_diff == 0):
+            return 100000000
+        else:
+            if(time_diff<0):
+                new_long = pt2[5]*time_diff+pt2[2]
+                new_lat = pt2[6]*time_diff+pt2[1]
+                projected_pos = np.array([new_lat, new_long])
+                actual_pos = np.array([pt1[1], pt1[2]])
+                return np.linalg.norm(projected_pos-actual_pos) #+ 20*time_diff + 10000*abs(speed_diff*dir_diff)
+            else:
+                new_long = pt1[5]*time_diff+pt1[2]
+                new_lat = pt1[6]*time_diff+pt1[1]
+                projected_pos = np.array([new_lat, new_long])
+                actual_pos = np.array([pt2[1], pt2[2]])
+                return np.linalg.norm(projected_pos-actual_pos)
+    
+    
+    Z = linkage(new_features, method = 'average', metric = custom_distance)
+    
+    agg_labels = fcluster(Z, t=threshold, criterion='maxclust')
+    
+    """
     scaler = StandardScaler()
     testFeatures = scaler.fit_transform(testFeatures)
     km = KMeans(n_clusters=numVessels, init='k-means++', n_init=10, 
                 random_state=100)
     predVessels = km.fit_predict(testFeatures)
+    """
     
-    return predVessels
+    return agg_labels
 
 def predictWithoutK(testFeatures, trainFeatures=None, trainLabels=None):
     # Unsupervised prediction, so training data is unused

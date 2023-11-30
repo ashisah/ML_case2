@@ -73,5 +73,5 @@ plotVesselTracks(features[:,[2,1]], agg_labels)
 print(adjusted_rand_score(labels, agg_labels))
 
 #%%perform spectral clustering 
-dendrogram(Z)
+dendrogram(Z)26
 #%%perform DBSCAN clustering
