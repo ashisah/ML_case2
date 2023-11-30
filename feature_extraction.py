@@ -23,9 +23,10 @@ dir_col = 4
 speeds = features[:, speed_col]
 degrees = features[:, dir_col]
 
-degrees = degrees/10
-speeds_knots = speeds/10
-speeds_knots_per_sec = speeds_knots/3600
+degrees = degrees/10 #converting to degrees
+degrees = (90-degrees)%360 #converting to correct orientation
+speeds_knots = speeds/10 #converting to nm/hr
+speeds_knots_per_sec = speeds_knots/3600 #converting to nm/sec
 
 radian_dir = degrees*np.pi/180
 

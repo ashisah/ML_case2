@@ -51,15 +51,15 @@ def custom_distance(pt1, pt2):
             new_lat = pt2[6]*time_diff+pt2[1]
             projected_pos = np.array([new_lat, new_long])
             actual_pos = np.array([pt1[1], pt1[2]])
-            return 100*np.linalg.norm(projected_pos-actual_pos) + 20*time_diff + 10000*abs(speed_diff*dir_diff)
+            return np.linalg.norm(projected_pos-actual_pos) #+ 20*time_diff + 10000*abs(speed_diff*dir_diff)
         else:
             new_long = pt1[5]*time_diff+pt1[2]
             new_lat = pt1[6]*time_diff+pt1[1]
             projected_pos = np.array([new_lat, new_long])
             actual_pos = np.array([pt2[1], pt2[2]])
-            return 100*np.linalg.norm(projected_pos-actual_pos) + 20*time_diff +10000*abs(speed_diff*dir_diff)
+            return np.linalg.norm(projected_pos-actual_pos)
 
-Z = linkage(new_features, method = 'single', metric = custom_distance)
+Z = linkage(new_features, method = 'complete', metric = custom_distance)
 
 plt.title('Hierarchical Clustering Dendrogram')
 plt.show()
@@ -73,5 +73,5 @@ plotVesselTracks(features[:,[2,1]], agg_labels)
 print(adjusted_rand_score(labels, agg_labels))
 
 #%%perform spectral clustering 
-
+dendrogram(Z)
 #%%perform DBSCAN clustering

@@ -9,8 +9,11 @@ Created on Fri Nov 24 16:04:09 2023
 from utils import loadData, plotVesselTracks
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import PillowWriter
+import plotly.express as px
+import pandas as pd
 #%%load data
+
 data = loadData('set1.csv')
 features = data[:,2:]
 labels = data[:,1]
@@ -136,23 +139,45 @@ for i in range(100001, 100021):
 
 #%%Try plotting a track over time
 
-fig = plt.figure()
+features_raw_csv = pd.read_csv('set1.csv', delimiter = ',')
+features_raw_csv['SEQUENCE_DTTM'] = pd.to_datetime(features_raw_csv['SEQUENCE_DTTM'], format='%H:%M:%S')
+features_raw_csv['time_string'] = features_raw_csv['SEQUENCE_DTTM'].dt.strftime('%H:%M:%S')
 
-graph, = plt.plot([], [], 'o')
+pd_one_vessel = features_raw_csv.loc[features_raw_csv['VID'] == 100001]
 
-indices = np.where(labels == 100001)[0].tolist()
-
-x = features[indices, 2]
-y = features[indices, 1]
-
-def animate(i):
-    graph.set_data(x[:i+1], y[:i+1])
-    return graph
-
-anim = FuncAnimation(fig, animate, frames=10, interval=200)
+"""
+px.scatter_mapbox(
+    features_raw_csv,
+    lat = 'LAT',
+    lon = 'LON',
+    animation_frame = 'time_string'
+).update_layout(
+    mapbox = {"style": "carto-positron"}
+)
+   
+"""
 
 #%%
-plt.show()
 
-    
+fig = plt.figure()
+l, = plt.scatter([], [])
+
+plt.xlim(np.min(features_raw_csv['LAT'])-0.05, np.max(features_raw_csv['LAT'])+0.05)
+plt.ylim(np.min(features_raw_csv['LON'])-0.05, np.max(features_raw_csv['LON'])+0.05)
+writer = PillowWriter(fps = 15, metadata=None)
+
+xlist = []
+ylist = []
+
+unique_times = np.unique(features_raw_csv['SEQUENCE_DTTM'])
+
+with writer.saving(fig, "/Users/monugoel/Desktop/CSDS_340/case2/tryone.gif", 100):
+    for time in unique_times:
+        result_df = features_raw_csv.loc[features_raw_csv['SEQUENCE_DTTM']==time]
+        for i in range(0, len(result_df)):
+            xlist.append(result_df.iloc[i]['LAT'])
+            ylist.append(result_df.iloc[i]['LON'])
         
+        l.set_data(xlist, ylist)
+        writer.grab_frame()
+
