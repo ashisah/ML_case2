@@ -33,7 +33,7 @@ radian_dir = degrees*np.pi/180
 
 #degrees of longitude will vary in distance depending on how far you are from the equator
 #at 36.99 degree latitude the distance between a degree of longitude is 48 nautical miles
-x_speed_per_sec = 1/48*speeds_knots_per_sec*np.cos(radian_dir)*-1
+x_speed_per_sec = 1/48*speeds_knots_per_sec*np.cos(radian_dir)
 #degrees of latitiude are 60 nautical miles apart
 y_speed_per_sec = 1/60*speeds_knots_per_sec*np.sin(radian_dir)
 
@@ -42,7 +42,7 @@ x_speed_per_sec = x_speed_per_sec[...,np.newaxis]
 y_speed_per_sec = y_speed_per_sec[...,np.newaxis]
 radian_dir = radian_dir[...,np.newaxis]
 
-new_features = np.concatenate((features[:, 0:3], speeds_knots_per_sec, radian_dir, x_speed_per_sec, y_speed_per_sec),axis = 1)
+new_features = np.concatenate((features[:, 0:3], speeds_knots_per_sec, radian_dir, x_speed_per_sec, y_speed_per_sec, features[:, 4][..., np.newaxis]) ,axis = 1)
 
 #%%write out new features to csv
 new_feats = pd.DataFrame(new_features)

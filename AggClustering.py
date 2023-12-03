@@ -47,8 +47,8 @@ def custom_distance(pt1, pt2):
         return 100000000
     else:
         if(time_diff<0):
-            new_long = pt2[5]*time_diff+pt2[2]
-            new_lat = pt2[6]*time_diff+pt2[1]
+            new_long = pt2[5]*time_diff*-1+pt2[2]
+            new_lat = pt2[6]*time_diff*-1+pt2[1]
             projected_pos = np.array([new_lat, new_long])
             actual_pos = np.array([pt1[1], pt1[2]])
             return np.linalg.norm(projected_pos-actual_pos) #+ 20*time_diff + 10000*abs(speed_diff*dir_diff)
@@ -59,7 +59,7 @@ def custom_distance(pt1, pt2):
             actual_pos = np.array([pt2[1], pt2[2]])
             return np.linalg.norm(projected_pos-actual_pos)
 
-Z = linkage(new_features, method = 'complete', metric = custom_distance)
+Z = linkage(new_features, method = 'average', metric = custom_distance)
 
 plt.title('Hierarchical Clustering Dendrogram')
 plt.show()

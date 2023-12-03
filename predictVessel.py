@@ -19,27 +19,30 @@ def predictWithK(testFeatures, numVessels, trainFeatures=None,
     # Unsupervised prediction, so training data is unused
     speed_col = 3
     dir_col = 4
-   
+
     speeds = testFeatures[:, speed_col]
     degrees = testFeatures[:, dir_col]
-    
+
     degrees = degrees/10 #converting to degrees
     degrees = (90-degrees)%360 #converting to correct orientation
     speeds_knots = speeds/10 #converting to nm/hr
     speeds_knots_per_sec = speeds_knots/3600 #converting to nm/sec
-    
+
     radian_dir = degrees*np.pi/180
-    
-    x_speed_per_sec = 1/48*speeds_knots_per_sec*np.cos(radian_dir)*-1
-    
+
+
+    #degrees of longitude will vary in distance depending on how far you are from the equator
+    #at 36.99 degree latitude the distance between a degree of longitude is 48 nautical miles
+    x_speed_per_sec = 1/48*speeds_knots_per_sec*np.cos(radian_dir)
+    #degrees of latitiude are 60 nautical miles apart
     y_speed_per_sec = 1/60*speeds_knots_per_sec*np.sin(radian_dir)
-    
+
     speeds_knots_per_sec = speeds_knots_per_sec[..., np.newaxis]
     x_speed_per_sec = x_speed_per_sec[...,np.newaxis]
     y_speed_per_sec = y_speed_per_sec[...,np.newaxis]
     radian_dir = radian_dir[...,np.newaxis]
 
-    new_features = np.concatenate((testFeatures[:, 0:3], speeds_knots_per_sec, radian_dir, x_speed_per_sec, y_speed_per_sec),axis = 1)
+    new_features = np.concatenate((testFeatures[:, 0:3], speeds_knots_per_sec, radian_dir, x_speed_per_sec, y_speed_per_sec, testFeatures[:, 4][..., np.newaxis]) ,axis = 1)
 
     def custom_distance(pt1, pt2):
         time_diff = pt2[0]-pt1[0]
@@ -49,8 +52,8 @@ def predictWithK(testFeatures, numVessels, trainFeatures=None,
             return 100000000
         else:
             if(time_diff<0):
-                new_long = pt2[5]*time_diff+pt2[2]
-                new_lat = pt2[6]*time_diff+pt2[1]
+                new_long = pt2[5]*time_diff*-1+pt2[2]
+                new_lat = pt2[6]*time_diff*-1+pt2[1]
                 projected_pos = np.array([new_lat, new_long])
                 actual_pos = np.array([pt1[1], pt1[2]])
                 return np.linalg.norm(projected_pos-actual_pos) #+ 20*time_diff + 10000*abs(speed_diff*dir_diff)
