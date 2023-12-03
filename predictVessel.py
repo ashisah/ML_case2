@@ -64,7 +64,7 @@ def predictWithK(testFeatures, numVessels, trainFeatures=None,
     
     Z = linkage(new_features, method = 'average', metric = custom_distance)
     
-    agg_labels = fcluster(Z, t=threshold, criterion='maxclust')
+    agg_labels = fcluster(Z, t=numVessels, criterion='maxclust')
     
     """
     scaler = StandardScaler()
