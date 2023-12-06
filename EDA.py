@@ -160,7 +160,7 @@ px.scatter_mapbox(
 #%%
 
 fig = plt.figure()
-l, = plt.scatter([], [])
+l = plt.scatter([], [])
 
 plt.xlim(np.min(features_raw_csv['LAT'])-0.05, np.max(features_raw_csv['LAT'])+0.05)
 plt.ylim(np.min(features_raw_csv['LON'])-0.05, np.max(features_raw_csv['LON'])+0.05)
@@ -180,4 +180,38 @@ with writer.saving(fig, "/Users/monugoel/Desktop/CSDS_340/case2/tryone.gif", 100
         
         l.set_data(xlist, ylist)
         writer.grab_frame()
+        
+#%%SET 3
+
+data = loadData('set3noVID.csv')
+features = data[:,2:]
+labels = data[:,1]
+
+plotVesselTracks(features[:,[2,1]])
+
+#%%ATTEMPT TWO:
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import numpy as np
+
+# Function to generate new data points (for demonstration purposes)
+def generate_new_data():
+    return np.random.rand(10), np.random.rand(10)
+
+# Initial data
+x_data, y_data = generate_new_data()
+
+# Create initial scatter plot
+fig, ax = plt.subplots()
+scat = ax.scatter(x_data, y_data)
+
+# Function to update the data of the scatter plot
+def update(frame):
+    new_x, new_y = generate_new_data()
+    scat.set_offsets(np.c_[new_x, new_y])
+
+# Create the animation
+ani = animation.FuncAnimation(fig, update, frames=50, interval=200)
+
+plt.show()
 

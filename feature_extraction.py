@@ -42,9 +42,9 @@ x_speed_per_sec = x_speed_per_sec[...,np.newaxis]
 y_speed_per_sec = y_speed_per_sec[...,np.newaxis]
 radian_dir = radian_dir[...,np.newaxis]
 
-new_features = np.concatenate((features[:, 0:3], speeds_knots_per_sec, radian_dir, x_speed_per_sec, y_speed_per_sec, features[:, 4][..., np.newaxis]) ,axis = 1)
+new_features = np.concatenate((features[:, 0:3], speeds_knots_per_sec, radian_dir, x_speed_per_sec, y_speed_per_sec),axis = 1)
 
 #%%write out new features to csv
 new_feats = pd.DataFrame(new_features)
-new_feats.to_csv('set1_transformed_features.csv', header = False, index = False)
+new_feats.to_csv('set1_transformed_features_plus_speed.csv', header = False, index = False)
 

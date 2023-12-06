@@ -32,7 +32,7 @@ def plotVesselTracks(latLon, clu=None):
         clu = np.ones(n)
     cluUnique = np.array(np.unique(clu), dtype=int)
     
-    plt.figure()
+    plt.figure(figsize=[12,8])
     markerList = list(markers.MarkerStyle.markers.keys())
     
     normClu = colors.Normalize(np.min(cluUnique),np.max(cluUnique))
@@ -46,3 +46,5 @@ def plotVesselTracks(latLon, clu=None):
     plt.legend().set_draggable(True)
     plt.xlabel('Longitude')
     plt.ylabel('Latitude')
+    plt.xlim(-76.3, -76)
+    plt.ylim(36.9, 37.04)
