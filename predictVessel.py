@@ -19,8 +19,8 @@ def predictWithK(testFeatures, numVessels, trainFeatures=None,
     dir_col = 4
     speed_col = 3
     
-    speeds = ((90 - (testFeatures[:, speed_col]/10))%360)*np.pi/180
-    radians = testFeatures[:, dir_col]/10
+    radians = ((90 - (testFeatures[:, dir_col]/10))%360)*np.pi/180
+    speeds = testFeatures[:, speed_col]/10
     
     x_speed = speeds*np.cos(radians)
     y_speed = speeds*np.sin(radians)
@@ -63,7 +63,7 @@ def predictWithK(testFeatures, numVessels, trainFeatures=None,
     
     predVessels = fcluster(Z, t=numVessels, criterion='maxclust')
     
-    return predVessels, new_features, Z, speeds, radians
+    return predVessels
 
 def predictWithoutK(testFeatures, trainFeatures=None, trainLabels=None):
     # Unsupervised prediction, so training data is unused
@@ -87,11 +87,11 @@ if __name__ == "__main__":
     
     # Prediction with specified number of vessels
     numVessels = np.unique(labels).size
-    predVesselsWithK, new_features, ZwithK, speeds, radians = predictWithK(features, numVessels)
+    predVesselsWithK= predictWithK(features, numVessels)
     ariWithK = adjusted_rand_score(labels, predVesselsWithK)
     
     # Prediction without specified number of vessels
-    predVesselsWithoutK, new_features, ZwoK, speeds, radians = predictWithoutK(features)
+    predVesselsWithoutK= predictWithoutK(features)
     predNumVessels = np.unique(predVesselsWithoutK).size
     ariWithoutK = adjusted_rand_score(labels, predVesselsWithoutK)
     
